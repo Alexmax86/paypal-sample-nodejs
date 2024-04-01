@@ -19,10 +19,10 @@ app.post("/api/orders", async (req, res) => {
 
 //Endpoint to capture payment
 app.post("/api/orders/:orderID/capture", async (req, res) => {
-  try {
+  try {    
     const { orderID } = req.params;
     const { jsonResponse, httpStatusCode } = await PayPalController.captureOrder(orderID);
-    res.status(httpStatusCode).json(jsonResponse);
+    res.status(httpStatusCode).json(jsonResponse);    
   } catch (error) {
     console.error("Failed to create order:", error);
     res.status(500).json({ error: "Failed to capture order." });

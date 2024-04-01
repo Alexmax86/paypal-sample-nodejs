@@ -1,4 +1,7 @@
 
+    /*********************************************************/
+    //This controller contains the calls to the Paypal API
+    /*********************************************************/
     require('dotenv').config()
 
     const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_BASEURL } = process.env;

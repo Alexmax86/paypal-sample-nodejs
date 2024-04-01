@@ -1,5 +1,6 @@
 //********************************************************************************
-//This modal confirms correct payment and gives option to refund(or re-try refund)
+//This modal confirms successful payments to the user 
+//and gives option to refund(or re-try failed refunds)
 //******************************************************************************** */
 const modalController = {
   //Initialize references to HTML elements
@@ -34,7 +35,7 @@ const modalController = {
         if (response.status === 'COMPLETED'){
           this.showDialogue({title:"Transaction refunded", caption:`The transaction was correctly refunded. Refund ID: ${response.id}`})}
         //Cover the case in which the status is different than COMPLETED 
-        else if(response.status !== 'COMPLETED' && response.status_details.reason) {
+        else if(response.status !== 'COMPLETED' && response.status_details?.reason) {
           this.showDialogueRefund({
             title:"Error", 
             caption:`The refund may not be complete. STATUS: ${response.status}: ${response.status_details.reason} `,
@@ -45,7 +46,7 @@ const modalController = {
         else if(response.details[0].description){
           this.showDialogueRefund({
             title:"Error", 
-            caption:`An error has occurred: ${response.details[0].description}. You may try the refund again. If the error persists, please contact the merchant.`,
+            caption:`An error has occurred, you may try the refund again. If the error persists, please contact the merchant. ERROR: ${response.details[0].description} `,
             transactionID: transactionID
           })
         }
@@ -68,6 +69,10 @@ const modalController = {
   }
 }
 
+//********************************************************************************
+//Reference to Paypal SDK to render buttons. Some customization are applied to 
+//adapt integrate it to the Website UI
+//******************************************************************************** */
 window.paypal
   .Buttons({
     //CREATE ORDER: CREATE ORDER ON PAYPAL'S SIDE. CUSTOMER WILL HAVE TO LOGIN TO CONFIRM
@@ -148,14 +153,21 @@ window.paypal
         }
       } catch (error) {
         console.error(error);
-        resultMessage(
-          `Sorry, your transaction could not be processed...<br><br>${error}`,
-        );
+        modalController.showDialogue({
+          title:"Error",
+          caption:`Sorry, your transaction could not be processed. Error: ${error}`
+        })
       }
     },
     onCancel: function (data) {
       // Show a cancel page or return to cart
       modalController.showDialogue({title:"Warning", caption:"The payment was cancelled."})
+    },
+    style: {
+      layout:  'vertical',
+      color:   'gold',
+      shape:   'rect',
+      label:   'paypal'
     }
   })
   .render("#paypal-button-container");
@@ -173,10 +185,7 @@ async function refundTransaction(transactionID){
     const parsedResponse = await response.json()
     return parsedResponse    
   }
-  catch(error) {
-  console.error(error);
-  resultMessage(
-    `Sorry, your transaction could not be refunded...<br><br>${error}`,
-  );
+  catch(error) {  
+    throw new Error(error);
   }
 }
