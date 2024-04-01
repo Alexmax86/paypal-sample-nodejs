@@ -2,3 +2,15 @@
     --primary-color: rgb(21, 255, 0); /* Custom primary color */
     --secondary-color: #6c757d; /* Custom secondary color */
   }
+
+  .container-fluid{
+    background-color: #FFEBB2;
+  }
+
+  h1{
+    color:#FA7070
+  }
+
+  .card{
+    background-color: #67C6E3;
+  }
