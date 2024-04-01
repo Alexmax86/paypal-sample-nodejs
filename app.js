@@ -9,9 +9,7 @@ app.use(express.json());
 //Endpoint to create orders
 app.post("/api/orders", async (req, res) => {
   try {    
-    // use the cart information passed from the front-end to calculate the order amount detals
-    const { cart } = req.body;
-    const { jsonResponse, httpStatusCode } = await PayPalController.createOrder(cart);
+    const { jsonResponse, httpStatusCode } = await PayPalController.createOrder();
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
     console.error("Failed to create order:", error);

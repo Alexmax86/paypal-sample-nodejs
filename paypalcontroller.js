@@ -25,7 +25,7 @@
         console.error("Failed to generate Access Token:", error);
       }
     }
-    async function createOrder(cart){      
+    async function createOrder(){      
       const accessToken = await generateAccessToken();
       const url = `${PAYPAL_BASEURL}/v2/checkout/orders`;
       const payload = {
@@ -33,7 +33,7 @@
         purchase_units: [
           {
             amount: {
-              currency_code: "USD",
+              currency_code: "EUR",
               value: "1.00",
             },
           },

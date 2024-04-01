@@ -1,3 +1,6 @@
+//********************************************************************************
+//This modal confirms correct payment and gives option to refund(or re-try refund)
+//******************************************************************************** */
 const modalController = {
   //Initialize references to HTML elements
   modal: new bootstrap.Modal(document.getElementById('myModal'), {keyboard: false}),
@@ -5,6 +8,7 @@ const modalController = {
   modalTitle: document.getElementById("modal-title"),
   modalBody: document.getElementById("modal-body")  ,
   refundSpinner: document.getElementById("refund-spinner"),  
+  
   //Functions
   showDialogue: function({title, caption}){        
     this.resetComponents()
@@ -73,17 +77,7 @@ window.paypal
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-          },
-          // use the "body" param to optionally pass additional order information
-          // like product ids and quantities
-          body: JSON.stringify({
-            cart: [
-              {
-                id: 1,
-                quantity: 1,
-              },
-            ],
-          }),
+          }
         });
         
         const orderData = await response.json();
@@ -114,6 +108,7 @@ window.paypal
         });
         
         const orderData = await response.json();
+        debugger;
         // Three cases to handle:
         //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
         //   (2) Other non-recoverable errors -> Show a failure message
@@ -158,16 +153,13 @@ window.paypal
         );
       }
     },
+    onCancel: function (data) {
+      // Show a cancel page or return to cart
+      modalController.showDialogue({title:"Warning", caption:"The payment was cancelled."})
+    }
   })
   .render("#paypal-button-container");
   
-// Example function to show a result to the user. Your site's UI library can be used instead.
-function resultMessage(message) {
-  const container = document.querySelector("#result-message");
-  container.innerHTML = message;
-}
-
-
 
 async function refundTransaction(transactionID){
   console.log(`Requesting paypal refund for transaction ${transactionID}`)
