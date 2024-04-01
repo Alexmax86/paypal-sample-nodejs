@@ -1,3 +1,69 @@
+const modalController = {
+  //Initialize references to HTML elements
+  modal: new bootstrap.Modal(document.getElementById('myModal'), {keyboard: false}),
+  refundButton: document.getElementById("refund-button"),
+  modalTitle: document.getElementById("modal-title"),
+  modalBody: document.getElementById("modal-body")  ,
+  refundSpinner: document.getElementById("refund-spinner"),  
+  //Functions
+  showDialogue: function({title, caption}){        
+    this.resetComponents()
+    this.modalTitle.textContent=title
+    this.modalBody.textContent=caption
+    this.refundButton.style.display='none'
+    this.modal.show()
+  },
+  showDialogueRefund: function({title, caption, transactionID}){
+    this.resetComponents() 
+    this.modalTitle.textContent=title
+    this.modalBody.textContent=caption
+    this.refundButton.style.display='block'
+    this.modal.show()
+    
+    this.refundButton.onclick = async () => { 
+      debugger;          
+      this.refundSpinner.style.display="block"
+      this.refundButton.setAttribute('disabled', 'true')
+      try {
+        const response = await refundTransaction(transactionID)
+        console.log(response)
+        if (response.status === 'COMPLETED'){
+          this.showDialogue({title:"Transaction refunded", caption:`The transaction was correctly refunded. Refund ID: ${response.id}`})}
+        //Cover the case in which the status is different than COMPLETED 
+        else if(response.status !== 'COMPLETED' && response.status_details.reason) {
+          this.showDialogueRefund({
+            title:"Error", 
+            caption:`The refund may not be complete. STATUS: ${response.status}: ${response.status_details.reason} `,
+            transactionID: transactionID
+          })
+        }
+        //Cover the case API returns error (unprocessable entity and the like)
+        else if(response.details[0].description){
+          this.showDialogueRefund({
+            title:"Error", 
+            caption:`An error has occurred: ${response.details[0].description}. You may try the refund again. If the error persists, please contact the merchant.`,
+            transactionID: transactionID
+          })
+        }
+        //Cover any other unpredicted error
+        else{
+          throw new Error(response);
+        }
+      } catch(e){
+        console.log(e);
+        this.showDialogue({title:"Error", caption: "An error has occurred. Please contact the merchant for support."})
+      }
+    }
+  },
+  resetComponents: function(){
+    this.modalTitle.textContent=""
+    this.modalBody.textContent=""
+    this.refundButton.style.display='none'
+    this.refundSpinner.style.display='none'
+    this.refundButton.removeAttribute('disabled');
+  }
+}
+
 window.paypal
   .Buttons({
     //CREATE ORDER: CREATE ORDER ON PAYPAL'S SIDE. CUSTOMER WILL HAVE TO LOGIN TO CONFIRM
@@ -13,8 +79,8 @@ window.paypal
           body: JSON.stringify({
             cart: [
               {
-                id: "YOUR_PRODUCT_ID",
-                quantity: "YOUR_PRODUCT_QUANTITY",
+                id: 1,
+                quantity: 1,
               },
             ],
           }),
@@ -69,12 +135,12 @@ window.paypal
           // Or go to another URL:  actions.redirect('thank_you.html');
           const transaction =
             orderData?.purchase_units?.[0]?.payments?.captures?.[0] 
-            /*Commenting out this line because this implementation is not design for authorizations
+            /*Commenting out this line because this implementation is not designed for authorizations
             || orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
             */
 
             console.log(orderData)
-          modalController({
+          modalController.showDialogueRefund({
             title:"Thanks for your purchase", 
             caption: `Transaction ${transaction.status}: ${transaction.id}. If you are not happy with this purchase you may refund it using the button below.`,
             transactionID: transaction.id
@@ -102,35 +168,6 @@ function resultMessage(message) {
 }
 
 
-const myModal = new bootstrap.Modal(document.getElementById('myModal'), {
-  keyboard: false
-})
-
-function modalController({title, caption, transactionID}){  
-  //Initialize modal
-  refundButton = document.getElementById("refund-button")
-  modalTitle = document.getElementById("modal-title")
-  modalBody = document.getElementById("modal-body")  
-  refundSpinner = document.getElementById("refund-spinner")  
-  modalTitle.textContent=title
-  modalBody.textContent=caption
-  myModal.show()
-  
-  //If transactionID is provided, refund button is shown
-  if (transactionID){
-    refundButton.style.display="block"
-    refundButton.onclick = async () => {
-      refundSpinner.style.display="block"
-      refundButton.setAttribute('disabled', 'true')
-      refundTransaction(transactionID)
-    }
-  }
-  else {
-    refundButton.style.display="none";
-    refundButton.onclick= undefined;
-  }
-}
-
 
 async function refundTransaction(transactionID){
   console.log(`Requesting paypal refund for transaction ${transactionID}`)
@@ -142,8 +179,7 @@ async function refundTransaction(transactionID){
       },
     });
     const parsedResponse = await response.json()
-    return parsedResponse
-    console.log(parsedResponse)
+    return parsedResponse    
   }
   catch(error) {
   console.error(error);
