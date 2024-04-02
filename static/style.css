@@ -1,22 +1,31 @@
+/***********************************************************************************/
+/*This stylesheet contains some customization to the Bootstrap default color scheme*/
+/***********************************************************************************/
 :root {
-    --primary-color: rgb(21, 255, 0); /* Custom primary color */
-    --secondary-color: #6c757d; /* Custom secondary color */
-  }
+  --custom-primary-color: #0b0eac; /* Custom primary color */
+  --custom-secondary-color: #67C6E3; /* Custom secondary color */
+}
 
-  .container-fluid{
-    background-color: #FFEBB2;
-  }
+.container-fluid{
+  background-color: #FFEBB2;
+}
 
-  h1{
-    color:#0b0eac;
-    
-    font-family: "Oswald", sans-serif;
+h1{
+  color: var(--custom-primary-color);  
+  font-family: "Oswald", sans-serif;
   font-optical-sizing: auto;
   font-weight: 700;
-  font-style: normal;
-    
-  }
+  font-style: normal;  
+}
 
-  .card{
-    background-color: #67C6E3;
-  }
+.card {
+  background-color: var(--custom-secondary-color);
+}
+
+.btn-confirm {
+  background-color: var(--custom-secondary-color);
+}
+
+.btn-confirm:hover{
+  background-color: #5cb1cb;
+}

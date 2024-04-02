@@ -31,6 +31,7 @@ const modalController = {
       this.refundButton.setAttribute('disabled', 'true')
       try {
         const response = await refundTransaction(transactionID)
+        console.log("Refund API response:")
         console.log(response)
         if (response.status === 'COMPLETED'){
           this.showDialogue({title:"Transaction refunded", caption:`The transaction was correctly refunded. Refund ID: ${response.id}`})}
@@ -71,7 +72,7 @@ const modalController = {
 
 //********************************************************************************
 //Reference to Paypal SDK to render buttons. Some customization are applied to 
-//adapt integrate it to the Website UI
+//integrate to the Website UI
 //******************************************************************************** */
 window.paypal
   .Buttons({
@@ -139,7 +140,7 @@ window.paypal
             || orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
             */
 
-            console.log(orderData)
+            
           modalController.showDialogueRefund({
             title:"Thanks for your purchase", 
             caption: `Transaction ${transaction.status}: ${transaction.id}. If you are not happy with this purchase you may refund it using the button below.`,
@@ -189,3 +190,5 @@ async function refundTransaction(transactionID){
     throw new Error(error);
   }
 }
+
+modalController.showDialogue({title:'Start', caption:"start"})
