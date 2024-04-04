@@ -114,7 +114,7 @@ window.paypal
         });
         
         const orderData = await response.json();
-        debugger;
+        
         // Three cases to handle:
         //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
         //   (2) Other non-recoverable errors -> Show a failure message
@@ -124,7 +124,7 @@ window.paypal
         
         if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
           // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-          // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
+          // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/          
           return actions.restart();
         } else if (errorDetail) {
           // (2) Other non-recoverable errors -> Show a failure message
@@ -191,4 +191,3 @@ async function refundTransaction(transactionID){
   }
 }
 
-modalController.showDialogue({title:'Start', caption:"start"})
