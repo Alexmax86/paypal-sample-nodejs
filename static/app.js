@@ -26,7 +26,7 @@ const modalController = {
     this.modal.show()
     
     this.refundButton.onclick = async () => { 
-      debugger;          
+      //debugger;          
       this.refundSpinner.style.display="block"
       this.refundButton.setAttribute('disabled', 'true')
       try {
